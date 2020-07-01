@@ -12,6 +12,7 @@ function(set_project_warnings project_name)
       -Wold-style-cast # warn for c-style casts
       -Wcast-align # warn for potential performance problem casts
       -Wunused # warn on anything being unused
+      -Wno-unused-parameter # Do not warn on unused parameter
       -Woverloaded-virtual # warn if you overload (not override) a virtual
                            # function
       -Wpedantic # warn if non-standard C++ is used
@@ -24,9 +25,9 @@ function(set_project_warnings project_name)
                  # (ie printf)
   )
 
-  if (WARNINGS_AS_ERRORS)
-    set(CLANG_WARNINGS ${CLANG_WARNINGS} -Werror)
-  endif()
+#  if (WARNINGS_AS_ERRORS)
+#    set(CLANG_WARNINGS ${CLANG_WARNINGS} -Werror)
+#  endif()
 
   set(GCC_WARNINGS
       ${CLANG_WARNINGS}
