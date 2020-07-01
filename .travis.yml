@@ -1,0 +1,73 @@
+dist: bionic
+language: cpp
+
+install:
+  - pip install --user conan cmake
+
+before_script:
+  - mkdir build
+  - cd build
+
+matrix:
+  include:
+  #
+  # G++ 
+  #
+  - os: linux
+    env:
+      - TEST="G++"
+    script:
+      - cmake -DENABLE_COVERAGE=ON -DENABLE_TESTING=ON ..
+      - make -j2
+      - ctest -j2
+      - cd ..
+      - bash <(curl -s https://codecov.io/bash)
+
+  #
+  # Clang 
+  #
+  - os: linux
+    env:
+      - TEST="Clang"
+    script:
+      - cmake -DENABLE_TESTING=ON -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ ..
+      - make -j2
+      - ctest -j2
+
+  #
+  # Google Sanitizer
+  #
+  - os: linux
+    env:
+      - TEST="Google Address and UB Sanitizer"
+    script:
+      - cmake -DENABLE_TESTING=ON -DENABLE_SANITIZER_ADDRESS:BOOL=TRUE -DENABLE_SANITIZER_LEAK:BOOL=TRUE -DENABLE_SANITIZER_UNDEFINED_BEHAVIOR:BOOL=TRUE ..
+      - make -j2
+      - ctest -j2
+  #
+  # Google Sanitizer
+  #
+  - os: linux
+    env:
+      - TEST="Google Memory Sanitizer"
+    script:
+      - cmake -DENABLE_TESTING=ON -DENABLE_SANITIZER_MEMORY:BOOL=TRUE ..
+      - make -j2
+      - ctest -j2
+      
+  #
+  # Valgrind
+  #
+  - os: linux
+    env:
+      - TEST="Valgrind"
+    addons:
+      apt:
+        sources:
+          - ubuntu-toolchain-r-test
+        packages:
+          - valgrind
+    script:
+      - cmake -DENABLE_TESTING=ON ..
+      - make -j2
+      - ctest -j2 -T memcheck
