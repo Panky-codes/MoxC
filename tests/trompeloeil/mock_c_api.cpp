@@ -1,7 +1,7 @@
 // unit-test_c_api.cpp
-#include "mock_c_api.h"
+#include "mock_c_api.hpp"
 
-API c_api_mock;
+mock_c_api_t c_api_mock;
 
 extern "C" {
 int c_api_func1(c_api_cookie *cookie, const char *str, int len) {

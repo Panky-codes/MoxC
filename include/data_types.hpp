@@ -11,4 +11,9 @@ struct func_info_t {
   std::string funcName{};
 };
 
+enum class file_type_t {
+  C_HEADER,
+  UNKNOWN_TYPE
+};
+
 #endif // DATA_TYPES_HPP_
