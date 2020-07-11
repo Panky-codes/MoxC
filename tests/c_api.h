@@ -12,7 +12,7 @@ struct c_api_cookie {
 };
 
 
-void c_api_end(struct c_api_cookie * cookie);
+void c_api_end(struct c_api_cookie *);
 
 int c_api_func1(struct c_api_cookie *cookie, const char *str, int len);
 

@@ -5,7 +5,6 @@
 #include <vector>
 
 struct func_info_t {
-
   std::string retType{};
   std::vector<std::string> args_type{};
   std::vector<std::string> args_name{};

@@ -7,6 +7,7 @@
 #include <vector>
 
 // Third-party header
+#include "fmt/format.h"
 #include <clang-c/Index.h>
 
 using namespace std;
@@ -22,7 +23,7 @@ static std::string get_string(const CXString &str) {
   return cppStr;
 }
 
-void printFunctionFromFile(const std::string &fileName) {
+void _helperPrintFunctionFromFile(const std::string &fileName) {
   CXIndex index = clang_createIndex(0, 0);
   CXTranslationUnit unit = clang_parseTranslationUnit(
       index, fileName.c_str(), nullptr, 0, nullptr, 0, CXTranslationUnit_None);
@@ -33,7 +34,7 @@ void printFunctionFromFile(const std::string &fileName) {
   CXCursor cursor = clang_getTranslationUnitCursor(unit);
   clang_visitChildren(
       cursor,
-      [](CXCursor c, CXCursor parent, CXClientData client_data) {
+      [](CXCursor c, CXCursor parent, CXClientData client_data) {   //NOLINT
         if (clang_getCursorKind(c) == CXCursorKind::CXCursor_FunctionDecl) {
           func_info_t func_info;
           std::vector<CXCursor> args;
@@ -75,22 +76,24 @@ std::vector<func_info_t> parseFunctionFromFile(const std::string &fileName) {
 
   clang_visitChildren(
       cursor,
-      [](CXCursor c, CXCursor parent, CXClientData client_data) {
+      [](CXCursor c, CXCursor parent, CXClientData client_data) { //NOLINT
         auto &parseFunc =
-            *reinterpret_cast<std::vector<func_info_t> *>(client_data);
+            *reinterpret_cast<std::vector<func_info_t> *>(client_data); //NOLINT As it is a C i/f
         if (clang_getCursorKind(c) == CXCursorKind::CXCursor_FunctionDecl) {
           func_info_t func_info;
           func_info.funcName = get_string(clang_getCursorSpelling(c));
           auto no_of_arg =
               static_cast<unsigned int>(clang_Cursor_getNumArguments(c));
-          //TODO: A header can have no name for the param. Should handle that case with default name
           for (unsigned int i = 0; i < no_of_arg; ++i) {
             auto arg = clang_Cursor_getArgument(c, i);
             auto arg_cursor_type = clang_getCursorType(arg);
             func_info.args_type.push_back(
                 get_string(clang_getTypeSpelling(arg_cursor_type)));
-            func_info.args_name.push_back(
-                get_string(clang_getCursorSpelling(arg)));
+            const auto arg_str = [&arg, i]() {
+              const auto str = get_string(clang_getCursorSpelling(arg));
+              return (empty(str)) ? fmt::format("arg_{}", i) : str;
+            }();
+            func_info.args_name.push_back(arg_str);
           }
 
           auto ret_type = clang_getResultType(clang_getCursorType(c));

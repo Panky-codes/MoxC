@@ -7,6 +7,6 @@
 
 [[nodiscard]] std::vector<func_info_t>
 parseFunctionFromFile(const std::string &fileName);
-void printFunctionFromFile(const std::string &fileName);
+void _helperPrintFunctionFromFile(const std::string &fileName);
 
 #endif // FILE_PARSER_HPP_
