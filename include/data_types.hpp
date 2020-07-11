@@ -7,7 +7,8 @@
 struct func_info_t {
 
   std::string retType{};
-  std::vector<std::string> args{};
+  std::vector<std::string> args_type{};
+  std::vector<std::string> args_name{};
   std::string funcName{};
 };
 

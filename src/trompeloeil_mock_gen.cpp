@@ -65,8 +65,8 @@ void TromeloeilMockGen::genMockHeader(
 
   out += fmt::format("class mock_{}_t {{ \n public: \n", m_file_name);
   for (const auto &elem : func_info) {
-    out += fmt::format("  MAKE_MOCK{0}({1},{2}({3})); \n", elem.args.size(),
-                       elem.funcName, elem.retType, fmt::join(elem.args, ", "));
+    out += fmt::format("  MAKE_MOCK{0}({1},{2}({3})); \n", elem.args_type.size(),
+                       elem.funcName, elem.retType, fmt::join(elem.args_type, ", "));
   }
 
   out += fmt::format("}}; \n\n");
@@ -85,13 +85,9 @@ void TromeloeilMockGen::genMockImpl(const std::vector<func_info_t> &func_info) {
   out += fmt::format("mock_{0}_t {0}_mock;\n\n", m_file_name);
   out += fmt::format("extern \"C\" {{ \n");
   for (const auto &elem : func_info) {
-    std::vector<std::string> args(elem.args.size());
-    std::vector<std::string> param_list(elem.args.size());
+    std::vector<std::string> param_list(elem.args_type.size());
 
-    std::generate(args.begin(), args.end(),
-                  [n = 0]() mutable { return fmt::format("arg_{}", n++); });
-
-    std::transform(args.begin(), args.end(), elem.args.begin(),
+    std::transform(elem.args_name.begin(), elem.args_name.end(), elem.args_type.begin(),
                    param_list.begin(),
                    [](std::string_view arg_name, std::string_view param_type) {
                      return fmt::format("{0} {1}", param_type, arg_name);
@@ -101,7 +97,7 @@ void TromeloeilMockGen::genMockImpl(const std::vector<func_info_t> &func_info) {
                        fmt::join(param_list, ", "));
 
     out += fmt::format("      return {0}_mock.{1}({2});\n", m_file_name,
-                       elem.funcName, fmt::join(args, ", "));
+                       elem.funcName, fmt::join(elem.args_name, ", "));
     out += fmt::format("      }} \n\n");
   }
   out += fmt::format("}}; \n\n");

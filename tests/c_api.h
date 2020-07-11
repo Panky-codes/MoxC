@@ -12,11 +12,12 @@ struct c_api_cookie {
 };
 
 
+void c_api_end(struct c_api_cookie * cookie);
+
 int c_api_func1(struct c_api_cookie *cookie, const char *str, int len);
 
 int c_api_func2(int len);
 
-void c_api_end(struct c_api_cookie *);
 
 #ifdef __cplusplus
 }

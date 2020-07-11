@@ -76,17 +76,21 @@ std::vector<func_info_t> parseFunctionFromFile(const std::string &fileName) {
   clang_visitChildren(
       cursor,
       [](CXCursor c, CXCursor parent, CXClientData client_data) {
-        auto& parseFunc = *reinterpret_cast<std::vector<func_info_t>*>(client_data); 
+        auto &parseFunc =
+            *reinterpret_cast<std::vector<func_info_t> *>(client_data);
         if (clang_getCursorKind(c) == CXCursorKind::CXCursor_FunctionDecl) {
           func_info_t func_info;
           func_info.funcName = get_string(clang_getCursorSpelling(c));
           auto no_of_arg =
               static_cast<unsigned int>(clang_Cursor_getNumArguments(c));
+          //TODO: A header can have no name for the param. Should handle that case with default name
           for (unsigned int i = 0; i < no_of_arg; ++i) {
-            auto arg_cursor_type =
-                clang_getCursorType(clang_Cursor_getArgument(c, i));
-            func_info.args.push_back(
+            auto arg = clang_Cursor_getArgument(c, i);
+            auto arg_cursor_type = clang_getCursorType(arg);
+            func_info.args_type.push_back(
                 get_string(clang_getTypeSpelling(arg_cursor_type)));
+            func_info.args_name.push_back(
+                get_string(clang_getCursorSpelling(arg)));
           }
 
           auto ret_type = clang_getResultType(clang_getCursorType(c));
