@@ -4,7 +4,9 @@
 #include "file_parser.hpp"
 
 // System header
+#include <algorithm>
 #include <fstream>
+#include <numeric>
 #include <string>
 #include <vector>
 
@@ -75,4 +77,35 @@ void TromeloeilMockGen::genMockHeader(
   file_header.close();
 }
 void TromeloeilMockGen::genMockImpl(const std::vector<func_info_t> &func_info) {
+
+  std::ofstream file_header(fmt::format("mock_{}.cpp", m_file_name));
+  std::string out;
+  out += fmt::format("#include \"mock_{}.hpp\" \n\n", m_file_name);
+
+  out += fmt::format("mock_{0}_t {0}_mock;\n\n", m_file_name);
+  out += fmt::format("extern \"C\" {{ \n");
+  for (const auto &elem : func_info) {
+    std::vector<std::string> args(elem.args.size());
+    std::vector<std::string> param_list(elem.args.size());
+
+    std::generate(args.begin(), args.end(),
+                  [n = 0]() mutable { return fmt::format("arg_{}", n++); });
+
+    std::transform(args.begin(), args.end(), elem.args.begin(),
+                   param_list.begin(),
+                   [](std::string_view arg_name, std::string_view param_type) {
+                     return fmt::format("{0} {1}", param_type, arg_name);
+                   });
+
+    out += fmt::format("  {0} {1}({2}) {{ \n", elem.retType, elem.funcName,
+                       fmt::join(param_list, ", "));
+
+    out += fmt::format("      return {0}_mock.{1}({2});\n", m_file_name,
+                       elem.funcName, fmt::join(args, ", "));
+    out += fmt::format("      }} \n\n");
+  }
+  out += fmt::format("}}; \n\n");
+
+  file_header.write(out.c_str(), static_cast<long>(out.size()));
+  file_header.close();
 }
