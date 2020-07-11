@@ -17,9 +17,8 @@ int main(int argc, char *argv[]) {
 
   try {
     auto func_info = parseFunctionFromFile(argv[1]);
-    fmt::print(stderr, "From the new parser ret!\n{0}\n",
-               func_info.at(0).args_type.at(0));
     TromeloeilMockGen mock_gen(argv[1], "../");
+    mock_gen.genMockHeader(func_info);
     mock_gen.genMockImpl(func_info);
   } catch (const std::exception &e) {
     fmt::print(stderr, "{}\n", e.what());
