@@ -6,25 +6,43 @@
 // System header
 
 // Third-party header
+#include "argparse/argparse.hpp"
 #include "fmt/format.h"
 
 int main(int argc, char *argv[]) {
   // Should use argparse here
-  if (argc == 1) {
-    fmt::print(stderr, "No input!!\n");
-    std::terminate();
-  }
+  argparse::ArgumentParser program(
+      "MoxC - C Mock generator for multiple frameworks");
+  program.add_argument("InterfaceFile").help("C Interface file");
+  program.add_argument("-d", "--dest")
+      .help("Destination folder for the generated mock files")
+      .default_value(std::string("."));
+  program.add_argument("-m", "--mock")
+      .help("Available Mock generation framework:"
+            "\n\t\t- Give gmock for GMock framework "
+            "\n\t\t- Give trom for Trompeloeil framework")
+      .default_value(std::string("gmock"));
 
   try {
-    auto func_info = parseFunctionFromFile(argv[1]);
-    const auto file_name = parseFileInfo(argv[1]);
+    program.parse_args(argc, argv);
+  } catch (const std::runtime_error &err) {
+    std::cout << err.what() << std::endl;
+    std::cout << program;
+    exit(0);
+  }
+  auto interface_file = program.get<std::string>("InterfaceFile");
+  auto dest_loc = program.get<std::string>("--dest");
 
-    TromeloeilMockGen mock_gen(file_name, "../");
+  try {
+    auto func_info = parseFunctionFromFile(interface_file);
+    const auto file_name = parseFileMetaData(interface_file);
+
+    TromeloeilMockGen mock_gen(file_name, dest_loc);
     mock_gen.genMockHeader(func_info);
     mock_gen.genMockImpl(func_info);
   } catch (const std::exception &e) {
     fmt::print(stderr, "{}\n", e.what());
-    std::abort();
+    exit(0);
   }
   return 0;
 }

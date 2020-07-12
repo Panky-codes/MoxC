@@ -110,7 +110,7 @@ std::vector<func_info_t> parseFunctionFromFile(const std::string &fileName) {
   return m_parseFunc;
 }
 
-std::string_view parseFileInfo(std::string_view interface_file) {
+std::string_view parseFileMetaData(std::string_view interface_file) {
   // TODO: Should make it cross platform for Windows later
   // If the interface_file looks like this => ../hello.h
   // Then first step gets the => hello.h
