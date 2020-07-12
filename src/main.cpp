@@ -4,7 +4,7 @@
 #include "trompeloeil_mock_gen.hpp"
 
 // System header
-
+#include <memory>
 // Third-party header
 #include "argparse/argparse.hpp"
 #include "fmt/format.h"
@@ -19,9 +19,9 @@ int main(int argc, char *argv[]) {
       .default_value(std::string("."));
   program.add_argument("-m", "--mock")
       .help("Available Mock generation framework:"
-            "\n\t\t- Give gmock for GMock framework "
-            "\n\t\t- Give trom for Trompeloeil framework")
-      .default_value(std::string("gmock"));
+            "\n\t\t- Option \"gmock\" for GMock framework "
+            "\n\t\t- Option \"trom\" for Trompeloeil framework")
+      .default_value(std::string("trom"));
 
   try {
     program.parse_args(argc, argv);
@@ -36,10 +36,10 @@ int main(int argc, char *argv[]) {
   try {
     auto func_info = parseFunctionFromFile(interface_file);
     const auto file_name = parseFileMetaData(interface_file);
-
-    TromeloeilMockGen mock_gen(file_name, dest_loc);
-    mock_gen.genMockHeader(func_info);
-    mock_gen.genMockImpl(func_info);
+    std::unique_ptr<IMockGen> mock_gen =
+        std::make_unique<TromeloeilMockGen>(file_name, dest_loc);
+    mock_gen->genMockHeader(func_info);
+    mock_gen->genMockImpl(func_info);
   } catch (const std::exception &e) {
     fmt::print(stderr, "{}\n", e.what());
     exit(0);

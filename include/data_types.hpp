@@ -16,4 +16,10 @@ enum class file_type_t {
   UNKNOWN_TYPE
 };
 
+enum class mock_gen_t {
+  Gmock,
+  Tromeloeil,
+  Unknown
+};
+
 #endif // DATA_TYPES_HPP_

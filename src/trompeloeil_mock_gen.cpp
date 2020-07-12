@@ -28,7 +28,8 @@ TromeloeilMockGen::TromeloeilMockGen(std::string_view file_name,
 void TromeloeilMockGen::genMockHeader(
     const std::vector<func_info_t> &func_info) {
 
-  std::ofstream file_header(fmt::format("mock_{}.hpp", m_file_name));
+  std::ofstream file_header(
+      fmt::format("{0}/mock_{1}.hpp", m_dest_path, m_file_name));
   if (file_header.fail()) {
     throw std::ios_base::failure(
         fmt::format("Unable to create file: mock_{}.hpp", m_file_name));
@@ -54,7 +55,8 @@ void TromeloeilMockGen::genMockHeader(
   file_header.close();
 }
 void TromeloeilMockGen::genMockImpl(const std::vector<func_info_t> &func_info) {
-  std::ofstream file_body(fmt::format("mock_{}.cpp", m_file_name));
+  std::ofstream file_body(
+      fmt::format("{0}/mock_{1}.cpp", m_dest_path, m_file_name));
   if (file_body.fail()) {
     throw std::ios_base::failure(
         fmt::format("Unable to create file: mock_{}.hpp", m_file_name));
