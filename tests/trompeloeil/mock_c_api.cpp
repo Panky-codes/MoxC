@@ -1,14 +1,19 @@
-// unit-test_c_api.cpp
-#include "mock_c_api.hpp"
+#include "mock_c_api.hpp" 
 
 mock_c_api_t c_api_mock;
 
-extern "C" {
-int c_api_func1(c_api_cookie *cookie, const char *str, int len) {
-  return c_api_mock.c_api_func1(cookie, str, len);
-}
+extern "C" { 
+  void c_api_end(struct c_api_cookie * arg_0) { 
+      return c_api_mock.c_api_end(arg_0);
+      } 
 
-int c_api_func2(int len) { return c_api_mock.c_api_func2(len); }
+  int c_api_func1(struct c_api_cookie * cookie, const char * str, int len) { 
+      return c_api_mock.c_api_func1(cookie, str, len);
+      } 
 
-void c_api_end(c_api_cookie *cookie) { c_api_mock.c_api_end(cookie); }
-}
+  int c_api_func2(int len) { 
+      return c_api_mock.c_api_func2(len);
+      } 
+
+}; 
+

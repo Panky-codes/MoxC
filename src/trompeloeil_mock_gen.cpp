@@ -21,43 +21,18 @@ static std::string str_toupper(std::string_view s) {
   return ret_str;
 }
 
-TromeloeilMockGen::TromeloeilMockGen(std::string_view interface_file,
+TromeloeilMockGen::TromeloeilMockGen(std::string_view file_name,
                                      std::string_view dest_path)
-    : m_dest_path{dest_path} {
-  // TODO: Should make it cross platform for Windows later
-  // If the interface_file looks like this => ../hello.h
-  // Then first step gets the => hello.h
-  // Second step separates the file name and determines type
-  // It will throw an exception in generateMocks function if the header is
-  // invalid
-  const std::string_view delimiter = "/";
-  const auto split_point = [&interface_file, &delimiter]() {
-    auto loc = interface_file.find_last_of(delimiter);
-    return (loc == std::string_view::npos) ? 0 : (loc + 1);
-  }();
-  const auto sub_str_len = interface_file.size() - split_point;
-  const auto file_name_w_ext = interface_file.substr(split_point, sub_str_len);
-
-  const std::string_view dot = ".";
-  const auto dot_loc = [&file_name_w_ext, &dot]() {
-    auto loc = file_name_w_ext.find_last_of(dot);
-    return (loc == std::string_view::npos) ? 0 : (loc);
-  }();
-  m_file_type =
-      (file_name_w_ext.substr(dot_loc + 1, file_name_w_ext.size()) == "h")
-          ? file_type_t::C_HEADER
-          : file_type_t::UNKNOWN_TYPE;
-  m_file_name = (m_file_type == file_type_t::C_HEADER)
-                    ? interface_file.substr(split_point, dot_loc)
-                    : "";
-}
+    : m_file_name{file_name}, m_dest_path{dest_path} {}
 
 void TromeloeilMockGen::genMockHeader(
     const std::vector<func_info_t> &func_info) {
-  if (m_file_type == file_type_t::UNKNOWN_TYPE) {
-    throw std::invalid_argument("The given file type is not valid");
-  }
+
   std::ofstream file_header(fmt::format("mock_{}.hpp", m_file_name));
+  if (file_header.fail()) {
+    throw std::ios_base::failure(
+        fmt::format("Unable to create file: mock_{}.hpp", m_file_name));
+  }
   std::string out;
   out += fmt::format("#ifndef MOCK_{}_HPP_ \n", str_toupper(m_file_name));
   out += fmt::format("#define MOCK_{}_HPP_ \n\n", str_toupper(m_file_name));
@@ -79,11 +54,11 @@ void TromeloeilMockGen::genMockHeader(
   file_header.close();
 }
 void TromeloeilMockGen::genMockImpl(const std::vector<func_info_t> &func_info) {
-  if (m_file_type == file_type_t::UNKNOWN_TYPE) {
-    throw std::invalid_argument("The given file type is not valid");
+  std::ofstream file_body(fmt::format("mock_{}.cpp", m_file_name));
+  if (file_body.fail()) {
+    throw std::ios_base::failure(
+        fmt::format("Unable to create file: mock_{}.hpp", m_file_name));
   }
-
-  std::ofstream file_header(fmt::format("mock_{}.cpp", m_file_name));
   std::string out;
   out += fmt::format("#include \"mock_{}.hpp\" \n\n", m_file_name);
 
@@ -107,6 +82,6 @@ void TromeloeilMockGen::genMockImpl(const std::vector<func_info_t> &func_info) {
   }
   out += fmt::format("}}; \n\n");
 
-  file_header.write(out.c_str(), static_cast<long>(out.size()));
-  file_header.close();
+  file_body.write(out.c_str(), static_cast<long>(out.size()));
+  file_body.close();
 }

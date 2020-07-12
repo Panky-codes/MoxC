@@ -5,7 +5,7 @@ include_directories(${CMAKE_SOURCE_DIR}/tests/trompeloeil)
 add_library(catch_main STATIC tests-main.cpp)
 target_link_libraries(catch_main PUBLIC CONAN_PKG::catch2)
 
-add_library(mock_c_api STATIC trompeloeil/mock_c_api1.cpp)
+add_library(mock_c_api STATIC trompeloeil/mock_c_api.cpp)
 target_link_libraries(mock_c_api PUBLIC CONAN_PKG::trompeloeil)
 
 add_library(client_c_api STATIC client_c_api.cpp)

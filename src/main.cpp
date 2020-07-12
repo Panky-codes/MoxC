@@ -17,7 +17,9 @@ int main(int argc, char *argv[]) {
 
   try {
     auto func_info = parseFunctionFromFile(argv[1]);
-    TromeloeilMockGen mock_gen(argv[1], "../");
+    const auto file_name = parseFileInfo(argv[1]);
+
+    TromeloeilMockGen mock_gen(file_name, "../");
     mock_gen.genMockHeader(func_info);
     mock_gen.genMockImpl(func_info);
   } catch (const std::exception &e) {

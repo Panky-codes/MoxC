@@ -2,7 +2,7 @@
 #include "trompeloeil.hpp"
 
 #include "client_c_api.hpp"
-#include "mock_c_api.h"
+#include "mock_c_api.hpp"
 
 TEST_CASE("DUMMY TEST") {
   REQUIRE_CALL(c_api_mock, c_api_func2(2)).RETURN(4);
