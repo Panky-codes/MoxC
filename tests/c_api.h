@@ -11,8 +11,14 @@ struct c_api_cookie {
   float var2;
 };
 
+typedef struct c_api_var {
+  int var1;
+  float var2;
+}c_api_var_t;
 
-void c_api_end(struct c_api_cookie *);
+int c_api_end(struct c_api_cookie);
+
+int c_api_front(c_api_var_t var_struct);
 
 int c_api_func1(struct c_api_cookie *cookie, const char *str, int len);
 
