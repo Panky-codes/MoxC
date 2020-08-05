@@ -2,6 +2,7 @@
 #include "arg_parser.hpp"
 #include "data_types.hpp"
 #include "file_parser.hpp"
+#include "gmock_mock_gen.hpp"
 #include "trompeloeil_mock_gen.hpp"
 
 // System header
@@ -12,11 +13,24 @@
 #include "fmt/format.h"
 
 // Static functions
-std::unique_ptr<IMockGen> makeMockGen(mock_gen_t mock_framework,
+static std::unique_ptr<IMockGen> makeMockGen(mock_gen_t mock_framework,
                                       std::string_view file_name,
                                       std::string_view dest_loc) {
   // TODO: Return based on condition
-  return std::make_unique<TromeloeilMockGen>(file_name, dest_loc);
+  switch (mock_framework) {
+  case mock_gen_t::Tromeloeil: {
+    return std::make_unique<TromeloeilMockGen>(file_name, dest_loc);
+  }
+  case mock_gen_t::Gmock: {
+    return std::make_unique<GmockMockGen>(file_name, dest_loc);
+  }
+  case mock_gen_t::Unknown: {
+    throw std::invalid_argument("Not a valid mocking framework");
+  }
+  default: {
+    throw std::invalid_argument("Not a valid mocking framework");
+  }
+  }
 }
 
 int main(int argc, char *argv[]) {

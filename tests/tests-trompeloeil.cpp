@@ -6,6 +6,8 @@
 
 using trompeloeil::_;
 
+mock_c_api_t c_api_mock;
+
 TEST_CASE("Checking Trompeloeil mocks") {
   SECTION("FUNC2") {
     REQUIRE_CALL(c_api_mock, c_api_func2(2)).RETURN(4);

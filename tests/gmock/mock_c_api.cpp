@@ -1,6 +1,6 @@
 #include "mock_c_api.hpp" 
 
-extern mock_c_api_t c_api_mock; 
+extern mock_c_api_t c_api_mock;
 
 extern "C" { 
   int c_api_end(struct c_api_cookie arg_0) { 
@@ -18,4 +18,5 @@ extern "C" {
   int c_api_func2(int len) { 
       return c_api_mock.c_api_func2(len);
       } 
+
 }; 

@@ -1,5 +1,5 @@
 // Own header
-#include "trompeloeil_mock_gen.hpp"
+#include "gmock_mock_gen.hpp"
 #include "data_types.hpp"
 #include "file_parser.hpp"
 
@@ -13,7 +13,7 @@
 // Third-party header
 #include "fmt/format.h"
 
-//TODO:
+// TODO:
 // should the extern be in the mock.cpp file ?
 
 // Static functions
@@ -24,12 +24,11 @@ static std::string str_toupper(std::string_view s) {
   return ret_str;
 }
 
-TromeloeilMockGen::TromeloeilMockGen(std::string_view file_name,
-                                     std::string_view dest_path)
+GmockMockGen::GmockMockGen(std::string_view file_name,
+                           std::string_view dest_path)
     : m_file_name{file_name}, m_dest_path{dest_path} {}
 
-void TromeloeilMockGen::genMockHeader(
-    const std::vector<func_info_t> &func_info) {
+void GmockMockGen::genMockHeader(const std::vector<func_info_t> &func_info) {
 
   std::ofstream file_header(
       fmt::format("{0}/mock_{1}.hpp", m_dest_path, m_file_name));
@@ -41,13 +40,12 @@ void TromeloeilMockGen::genMockHeader(
   out += fmt::format("#ifndef MOCK_{}_HPP_ \n", str_toupper(m_file_name));
   out += fmt::format("#define MOCK_{}_HPP_ \n\n", str_toupper(m_file_name));
   out += fmt::format("#include \"{}.h\" \n", m_file_name);
-  out += fmt::format("#include <trompeloeil.hpp> \n\n");
+  out += fmt::format("#include <gmock/gmock.h> \n\n");
 
   out += fmt::format("class mock_{}_t {{ \n public: \n", m_file_name);
   for (const auto &elem : func_info) {
-    out += fmt::format("  MAKE_MOCK{0}({1},{2}({3})); \n",
-                       elem.args_type.size(), elem.funcName, elem.retType,
-                       fmt::join(elem.args_type, ", "));
+    out += fmt::format("  MOCK_METHOD({0}, {1},({2})); \n", elem.retType,
+                       elem.funcName, fmt::join(elem.args_type, ", "));
   }
 
   out += fmt::format("}}; \n\n");
@@ -56,7 +54,8 @@ void TromeloeilMockGen::genMockHeader(
   file_header.write(out.c_str(), static_cast<long>(out.size()));
   file_header.close();
 }
-void TromeloeilMockGen::genMockImpl(const std::vector<func_info_t> &func_info) {
+
+void GmockMockGen::genMockImpl(const std::vector<func_info_t> &func_info) {
   std::ofstream file_body(
       fmt::format("{0}/mock_{1}.cpp", m_dest_path, m_file_name));
   if (file_body.fail()) {

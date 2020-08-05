@@ -12,6 +12,4 @@ class mock_c_api_t {
   MAKE_MOCK1(c_api_func2,int(int)); 
 }; 
 
-extern mock_c_api_t c_api_mock; 
-
 #endif // MOCK_C_API_HPP_ 

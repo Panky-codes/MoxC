@@ -8,7 +8,7 @@
 #include "argparse/argparse.hpp"
 
 ArgParser::ArgParser(const std::string &exe_name)
-    : m_mock_framework{mock_gen_t::Unknown}, m_program{argparse::ArgumentParser(
+    : m_mock_framework{mock_gen_t::Gmock}, m_program{argparse::ArgumentParser(
                                                  exe_name)} {}
 
 void ArgParser::configureArgs() {
@@ -20,7 +20,7 @@ void ArgParser::configureArgs() {
       .help("Available Mock generation framework:"
             "\n\t\t- \"gmock\" for GMock framework (default)"
             "\n\t\t- \"trom\" for Trompeloeil framework")
-      .default_value(std::string("trom"));
+      .default_value(std::string("gmock"));
 }
 
 void ArgParser::parseArgs(int argc, char *argv[]) { // NOLINT
