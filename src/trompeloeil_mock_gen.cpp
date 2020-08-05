@@ -13,6 +13,9 @@
 // Third-party header
 #include "fmt/format.h"
 
+//TODO:
+// should the extern be in the mock.cpp file ?
+
 // Static functions
 static std::string str_toupper(std::string_view s) {
   std::string ret_str(s);

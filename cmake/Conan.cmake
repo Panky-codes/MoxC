@@ -20,6 +20,8 @@ conan_cmake_run(
   conanfile.txt
   OPTIONS
   ${CONAN_EXTRA_OPTIONS}
+  SETTINGS
+  compiler.libcxx=libstdc++11
   BASIC_SETUP
   CMAKE_TARGETS # individual targets to link to
   BUILD
