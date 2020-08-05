@@ -19,7 +19,6 @@ enum class file_type_t {
 enum class mock_gen_t {
   Gmock,
   Tromeloeil,
-  Unknown
 };
 
 #endif // DATA_TYPES_HPP_

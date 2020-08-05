@@ -24,9 +24,6 @@ static std::unique_ptr<IMockGen> makeMockGen(mock_gen_t mock_framework,
   case mock_gen_t::Gmock: {
     return std::make_unique<GmockMockGen>(file_name, dest_loc);
   }
-  case mock_gen_t::Unknown: {
-    throw std::invalid_argument("Not a valid mocking framework");
-  }
   default: {
     throw std::invalid_argument("Not a valid mocking framework");
   }
