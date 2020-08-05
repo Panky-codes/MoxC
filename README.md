@@ -1,10 +1,21 @@
 [![Build Status](https://travis-ci.org/Panky-codes/cpp-template.svg?branch=master)](https://travis-ci.org/Panky-codes/cpp-template)
-## What is cpp-template
-This is a minimal C++ template for CMake projects in Linux. Some parts are inspired from Jason Turner's [cpp-starter-project](https://github.com/lefticus/cpp_starter_project). Feel free to fork it and tailor it as per your needs.
+## MoxC (Mocks C)
+MoxC automatically generates mocks for C interface that can be used in a C++ unittest. It can generate mocks based on different open-source mocking frameworks. GMock and Troempeloeil (never get the spelling correct for this one) are currently supported.  
 
-## Dependencies
+## Sneak Peak
+
+## Install
+### Precompiled binary (Available only for Linux for now)
+## Build
+### Dependencies
 - GCC or Clang with C++17 support
 - CMake
 - Conan
+- Ninja
+- libclang
 
-
+After downloading the sources from github, go to the project root and execute the following command:
+```
+~/MoxC$ cmake -GNinja -B build 
+~/MoxC$ cmake --build build -- -j4
+```
