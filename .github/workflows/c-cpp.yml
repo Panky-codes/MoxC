@@ -18,6 +18,7 @@ jobs:
            echo $PATH
            conan --version
            ls
+           sudo ln -s ~/.local/bin/conan /usr/local/bin/conan
     - name: configure
       run: mkdir build && cd build && cmake -DENABLE_TESTING=ON ..
     - name: build
