@@ -9,9 +9,12 @@ jobs:
     
     steps:
     - uses: actions/checkout@v2
+    
     - name: Install dependencies
       run: |
            pwd
+           export CC="gcc"
+           export CXX="g++"
            pip3 install wheel setuptools
            pip3 install conan
            export PATH=$PATH:/home/runner/.local/bin
