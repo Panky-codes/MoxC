@@ -10,7 +10,9 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Install dependencies
-      run: pip3 install --user conan cmake
+      run: |
+             pip install --user conan cmake
+             export PATH=$PATH:/home/runner/.local/bin/conan
     - name: configure
       run: mkdir build && cd build && cmake -DENABLE_TESTING=ON ..
     - name: build
