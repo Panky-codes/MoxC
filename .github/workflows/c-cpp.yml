@@ -21,12 +21,7 @@ jobs:
            export PATH=$PATH:/home/runner/.local/bin
            echo $PATH
            conan --version
-           ls /usr/lib/llvm*/lib/libclang*
-           ls /usr/lib/llvm*/include/clang*
-           
            sudo ln -s ~/.local/bin/conan /usr/local/bin/conan
-           sudo ln -s /usr/lib/llvm-6.0/lib/libclang-6.0.so /usr/lib/
-           sudo ln -s /usr/lib/llvm-6.0/include/clang-c/ /usr/include/
     - name: configure
       run: mkdir build && cd build && cmake -DENABLE_TESTING=ON ..
     - name: build

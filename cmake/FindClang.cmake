@@ -40,8 +40,7 @@ macro(_Clang_find_library VAR NAME)
       PATH_SUFFIXES lib
     )
   else()
-      find_library(${VAR} NAMES ${NAME} HINTS "/usr/lib/llvm-4.0/lib" lib${NAME})
-      find_library(${VAR} NAMES ${NAME}  lib${NAME})
+      find_library(${VAR} NAMES ${NAME} HINTS "/usr/lib/llvm-${Clang_VERSION}/lib" lib${NAME})
   endif()
 endmacro()
 
@@ -54,8 +53,7 @@ macro(_Clang_find_path VAR INCLUDE_FILE)
       PATH_SUFFIXES include
     )
   else()
-      #find_path(${VAR} NAMES HINTS "/usr/lib/llvm-4.0/include/" ${INCLUDE_FILE})
-      find_path(${VAR} NAMES  ${INCLUDE_FILE})
+      find_path(${VAR} NAMES  ${INCLUDE_FILE} HINTS "/usr/lib/llvm-${Clang_VERSION}/include")
   endif()
 endmacro()
 
@@ -77,21 +75,22 @@ endmacro()
 set(_Clang_REQUIRED_VARS _libclang_LIBRARY _libclang_INCLUDE_DIR 
                          Clang_EXECUTABLE Clang_VERSION)
 
-_Clang_find_library(_libclang_LIBRARY clang)
-_Clang_find_path(_libclang_INCLUDE_DIR clang-c/Index.h)
 
 _Clang_find_program(Clang_EXECUTABLE clang++)
 
 if(Clang_EXECUTABLE)
   # Find Clang resource directory with Clang executable
   # Find Clang version
-  set(_Clang_VERSION_REGEX "([0-9]+)\\.([0-9]+)\\.([0-9]+)")
+  set(_Clang_VERSION_REGEX "([0-9]+)\\.([0-9]+)")
   execute_process(
     COMMAND ${Clang_EXECUTABLE} --version 
     OUTPUT_VARIABLE Clang_VERSION
   )
   string(REGEX MATCH ${_Clang_VERSION_REGEX} Clang_VERSION ${Clang_VERSION})
 endif()
+
+_Clang_find_library(_libclang_LIBRARY clang)
+_Clang_find_path(_libclang_INCLUDE_DIR clang-c/Index.h)
 
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(Clang
