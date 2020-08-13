@@ -3,7 +3,7 @@ include_directories(${CMAKE_SOURCE_DIR}/include)
 find_package(Clang REQUIRED)
 add_library(file_parser SHARED file_parser.cpp)
 target_link_libraries(
-      file_parser PRIVATE libclang CONAN_PKG::fmt project_warnings project_options)
+    file_parser PRIVATE Clang::Clang CONAN_PKG::fmt project_warnings project_options)
 
 add_library(arg_parser SHARED arg_parser.cpp)
 target_link_libraries(

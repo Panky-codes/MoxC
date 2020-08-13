@@ -16,7 +16,6 @@
 static std::unique_ptr<IMockGen> makeMockGen(mock_gen_t mock_framework,
                                       std::string_view file_name,
                                       std::string_view dest_loc) {
-  // TODO: Return based on condition
   switch (mock_framework) {
   case mock_gen_t::Tromeloeil: {
     return std::make_unique<TromeloeilMockGen>(file_name, dest_loc);
