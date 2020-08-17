@@ -12,19 +12,18 @@ jobs:
     
     - name: Install dependencies
       run: |
-           pwd
            sudo apt-get install -y llvm clang libclang-dev
            export CC="gcc"
            export CXX="g++"
            pip3 install wheel setuptools
            pip3 install conan
            export PATH=$PATH:/home/runner/.local/bin
-           echo $PATH
-           conan --version
            sudo ln -s ~/.local/bin/conan /usr/local/bin/conan
     - name: configure
       run: mkdir build && cd build && cmake -DENABLE_TESTING=ON ..
     - name: build
       run: cmake --build build --config Release -- -j 4
+    - name: post-build
+      run: build/bin/main_process tests/c_api.h -d tests/trompeloeil -m trom
     - name: test
       run: cd build && ctest

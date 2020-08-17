@@ -1,4 +1,5 @@
 // Own header
+#include "file_parser.hpp"
 #include "data_types.hpp"
 
 // System header
@@ -23,52 +24,15 @@ static std::string get_string(const CXString &str) {
   return cppStr;
 }
 
-void _helperPrintFunctionFromFile(const std::string &fileName) {
-  CXIndex index = clang_createIndex(0, 0);
-  CXTranslationUnit unit = clang_parseTranslationUnit(
-      index, fileName.c_str(), nullptr, 0, nullptr, 0, CXTranslationUnit_None);
-  if (unit == nullptr) {
-    cerr << "Unable to parse translation unit. Quitting." << endl;
-    exit(-1);
-  }
-  CXCursor cursor = clang_getTranslationUnitCursor(unit);
-  clang_visitChildren(
-      cursor,
-      [](CXCursor c, CXCursor parent, CXClientData client_data) { // NOLINT
-        if (clang_getCursorKind(c) == CXCursorKind::CXCursor_FunctionDecl) {
-          func_info_t func_info;
-          std::vector<CXCursor> args;
-          cout << "Function name: " << clang_getCursorSpelling(c) << "\n";
+FileParser::FileParser(std::string full_file_name)
+    : m_full_file_name{std::move(full_file_name)} {}
 
-          auto no_of_arg =
-              static_cast<unsigned int>(clang_Cursor_getNumArguments(c));
-          for (unsigned int i = 0; i < no_of_arg; ++i) {
-            args.push_back(clang_Cursor_getArgument(c, i));
-          }
-          cout << "Argument name: ";
-          for (auto arg : args) {
-            cout << clang_getTypeSpelling(clang_getCursorType(arg)) << ", ";
-          }
-
-          auto ret_type = clang_getResultType(clang_getCursorType(c));
-          cout << "\n"
-               << "Return type name: " << clang_getTypeSpelling(ret_type)
-               << "\n";
-          func_info.retType = get_string(clang_getTypeSpelling(ret_type));
-        }
-        return CXChildVisit_Recurse;
-      },
-      nullptr);
-
-  clang_disposeTranslationUnit(unit);
-  clang_disposeIndex(index);
-}
-
-std::vector<func_info_t> parseFunctionFromFile(const std::string &fileName) {
+std::vector<func_info_t>
+FileParser::parseFunctionInfo() {
   std::vector<func_info_t> m_parseFunc;
   CXIndex index = clang_createIndex(0, 0);
   CXTranslationUnit unit = clang_parseTranslationUnit(
-      index, fileName.c_str(), nullptr, 0, nullptr, 0, CXTranslationUnit_None);
+      index, m_full_file_name.c_str(), nullptr, 0, nullptr, 0, CXTranslationUnit_None);
   if (unit == nullptr) {
     throw std::invalid_argument(
         "Unable to parse translation unit. Give a valid .h C header file");
@@ -110,37 +74,45 @@ std::vector<func_info_t> parseFunctionFromFile(const std::string &fileName) {
   return m_parseFunc;
 }
 
-std::string_view parseFileMetaData(std::string_view interface_file) {
+std::pair<std::string_view, file_type_t>
+FileParser::getFileMetaData() {
   // TODO: Should make it cross platform for Windows later
-  // If the interface_file looks like this => ../hello.h
+  // If the m_full_file_name looks like this => ../hello.h
   // Then first step gets the => hello.h
   // Second step separates the file name and determines type
   // It will throw an exception in generateMocks function if the header is
   // invalid
   const std::string_view delimiter = "/";
-  const auto split_point = [&interface_file, &delimiter]() {
-    auto loc = interface_file.find_last_of(delimiter);
+  const auto split_point = [&]() {
+    auto loc = m_full_file_name.find_last_of(delimiter);
     return (loc == std::string_view::npos) ? 0 : (loc + 1);
   }();
-  const auto sub_str_len = interface_file.size() - split_point;
-  const auto file_name_w_ext = interface_file.substr(split_point, sub_str_len);
+  const auto sub_str_len = m_full_file_name.size() - split_point;
+  const auto file_name_w_ext = m_full_file_name.substr(split_point, sub_str_len);
 
   const std::string_view dot = ".";
   const auto dot_loc = [&file_name_w_ext, &dot]() {
     auto loc = file_name_w_ext.find_last_of(dot);
     return (loc == std::string_view::npos) ? 0 : (loc);
   }();
-  const auto file_type =
-      (file_name_w_ext.substr(dot_loc + 1, file_name_w_ext.size()) == "h")
-          ? file_type_t::C_HEADER
-          : file_type_t::UNKNOWN_TYPE;
 
-  if (file_type == file_type_t::UNKNOWN_TYPE) {
+  const auto extention =
+      file_name_w_ext.substr(dot_loc + 1, file_name_w_ext.size());
+  if (extention == "h") {
+    m_file_type = file_type_t::C_HEADER;
+  } else if (extention == "hpp") {
+    m_file_type = file_type_t::CPP_HEADER;
+  } else {
+    m_file_type = file_type_t::UNKNOWN_TYPE;
+  }
+
+  if (m_file_type == file_type_t::UNKNOWN_TYPE) {
     throw std::invalid_argument(
         "The given file type is not valid! Give valid .h C header file");
   }
-  const auto file_name = (file_type == file_type_t::C_HEADER)
-                             ? interface_file.substr(split_point, dot_loc)
-                             : "";
-  return file_name;
+  m_file_name = (m_file_type != file_type_t::UNKNOWN_TYPE)
+                    ? m_full_file_name.substr(split_point, dot_loc)
+                    : "";
+
+  return {m_file_name, m_file_type};
 }

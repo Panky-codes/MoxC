@@ -9,13 +9,12 @@
 #include <memory>
 
 // Third-party header
-#include "argparse/argparse.hpp"
 #include "fmt/format.h"
 
 // Static functions
 static std::unique_ptr<IMockGen> makeMockGen(mock_gen_t mock_framework,
-                                      std::string_view file_name,
-                                      std::string_view dest_loc) {
+                                             std::string_view file_name,
+                                             std::string_view dest_loc) {
   switch (mock_framework) {
   case mock_gen_t::Tromeloeil: {
     return std::make_unique<TromeloeilMockGen>(file_name, dest_loc);
@@ -43,8 +42,9 @@ int main(int argc, char *argv[]) {
   const auto [mock_framework, interface_file, dest_loc] =
       program.getArgValues();
   try {
-    auto func_info = parseFunctionFromFile(interface_file);
-    const auto file_name = parseFileMetaData(interface_file);
+    auto file_info = FileParser(interface_file);
+    const auto func_info = file_info.parseFunctionInfo();
+    const auto [file_name, _] = file_info.getFileMetaData();
     std::unique_ptr<IMockGen> mock_gen =
         makeMockGen(mock_framework, file_name, dest_loc);
     mock_gen->genMockHeader(func_info);

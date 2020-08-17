@@ -13,6 +13,7 @@ struct func_info_t {
 
 enum class file_type_t {
   C_HEADER,
+  CPP_HEADER,
   UNKNOWN_TYPE
 };
 
