@@ -23,7 +23,9 @@ jobs:
       run: mkdir build && cd build && cmake -DENABLE_TESTING=ON ..
     - name: build
       run: cmake --build build --config Release -- -j 4
-    - name: post-build
+    - name: post-build-trom
       run: build/bin/main_process tests/c_api.h -d tests/trompeloeil -m trom
+    - name: post-build-gmock
+      run: build/bin/main_process tests/c_api.h -d tests/Gmock
     - name: test
       run: cd build && ctest

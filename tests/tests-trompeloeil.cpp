@@ -2,7 +2,7 @@
 #include "trompeloeil.hpp"
 
 #include "client_c_api.hpp"
-#include "mock_c_api.hpp"
+#include "Trompeloeil/mock_c_api.hpp"
 
 using trompeloeil::_;
 

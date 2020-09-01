@@ -43,12 +43,20 @@ void GmockMockGen::genMockHeader(const std::vector<func_info_t> &func_info) {
   out += fmt::format("#include <gmock/gmock.h> \n\n");
 
   out += fmt::format("class mock_{}_t {{ \n public: \n", m_file_name);
+  out += fmt::format("  mock_{}_t();", m_file_name);
+  out += fmt::format("  ~mock_{}_t();", m_file_name);
   for (const auto &elem : func_info) {
     out += fmt::format("  MOCK_METHOD({0}, {1},({2})); \n", elem.retType,
                        elem.funcName, fmt::join(elem.args_type, ", "));
   }
 
   out += fmt::format("}}; \n\n");
+  out +=
+      fmt::format("using nice_mock_{0}_t = ::testing::NiceMock<mock_{0}_t>;\n",
+                  m_file_name);
+  out += fmt::format(
+      "using strict_mock_{0}_t = ::testing::StrictMock<mock_{0}_t>;\n\n",
+      m_file_name);
 
   out += fmt::format("#endif // MOCK_{}_HPP_ \n", str_toupper(m_file_name));
   file_header.write(out.c_str(), static_cast<long>(out.size()));
@@ -64,8 +72,15 @@ void GmockMockGen::genMockImpl(const std::vector<func_info_t> &func_info) {
   }
   std::string out;
   out += fmt::format("#include \"mock_{}.hpp\" \n\n", m_file_name);
+  out += fmt::format("static mock_{0}_t* local_ptr_to_impl = nullptr;\n",
+                     m_file_name);
+  out +=
+      fmt::format("mock_{0}_t::mock_{0}_t() {{ local_ptr_to_impl = this; }}\n",
+                  m_file_name);
+  out += fmt::format(
+      "mock_{0}_t::~mock_{0}_t() {{ local_ptr_to_impl = nullptr; }}\n\n",
+      m_file_name);
 
-  out += fmt::format("extern mock_{0}_t {0}_mock;\n\n", m_file_name);
   out += fmt::format("extern \"C\" {{ \n");
   for (const auto &elem : func_info) {
     std::vector<std::string> param_list(elem.args_type.size());
@@ -79,7 +94,7 @@ void GmockMockGen::genMockImpl(const std::vector<func_info_t> &func_info) {
     out += fmt::format("  {0} {1}({2}) {{ \n", elem.retType, elem.funcName,
                        fmt::join(param_list, ", "));
 
-    out += fmt::format("      return {0}_mock.{1}({2});\n", m_file_name,
+    out += fmt::format("      return local_ptr_to_impl->{0}({1});\n",
                        elem.funcName, fmt::join(elem.args_name, ", "));
     out += fmt::format("      }} \n\n");
   }
